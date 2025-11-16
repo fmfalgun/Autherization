@@ -1,0 +1,4 @@
+github.com/casbin/casbin/v2 v2.82.0 h1:AH4HggEWc/ioDAF9hEF0Y/CO0hgMDj5Q1qCR3IfvxGY=
+github.com/casbin/casbin/v2 v2.82.0/go.mod h1:+phjXnC/L/zKhSGbL7MN9rBKB66bIh04qHa/U0CYf70=
+github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNGr8w4BABcUZnDh3M3uBDN8UQY=
+github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcNwfGGh6NOQNPGC85BfN7FQ9Yk8o=

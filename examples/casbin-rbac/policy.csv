@@ -1,0 +1,26 @@
+# Format: p, role/user, resource, action
+
+# Admin permissions - full access
+p, admin, /api/*, *
+
+# Manager permissions - manage documents and view users
+p, manager, /api/documents, GET
+p, manager, /api/documents, POST
+p, manager, /api/documents, PUT
+p, manager, /api/documents/:id, GET
+p, manager, /api/documents/:id, PUT
+p, manager, /api/users, GET
+
+# User permissions - read only
+p, user, /api/documents, GET
+p, user, /api/documents/:id, GET
+p, user, /api/users, GET
+
+# Role hierarchy (inheritance)
+# Format: g, user, role
+
+g, alice, manager
+g, bob, user
+g, charlie, user
+g, admin_user, admin
+g, manager, user

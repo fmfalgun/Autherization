@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: opa-simple
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=debug"
+      - "--log-format=json-pretty"
+    volumes:
+      - ./policy.rego:/policies/policy.rego:ro
+      - ./data.json:/data/data.json:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - opa-network
+
+networks:
+  opa-network:
+    driver: bridge

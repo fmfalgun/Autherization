@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: multitenant-opa
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=debug"
+    volumes:
+      - ./policy.rego:/policies/policy.rego:ro
+      - ./tenants.json:/data/tenants.json:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - multitenant-network
+
+  api:
+    build: .
+    container_name: multitenant-api
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - OPA_URL=http://opa:8181/v1/data/multitenant/authz/allow
+    depends_on:
+      - opa
+    volumes:
+      - ./app.py:/app/app.py
+    networks:
+      - multitenant-network
+
+networks:
+  multitenant-network:
+    driver: bridge

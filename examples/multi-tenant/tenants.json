@@ -1,0 +1,32 @@
+{
+  "tenants": {
+    "acme": {
+      "id": "acme",
+      "name": "Acme Corporation",
+      "parent": null,
+      "active": true,
+      "created": "2025-01-15"
+    },
+    "acme-subsidiary": {
+      "id": "acme-subsidiary",
+      "name": "Acme Subsidiary LLC",
+      "parent": "acme",
+      "active": true,
+      "created": "2025-02-01"
+    },
+    "globex": {
+      "id": "globex",
+      "name": "Globex Inc",
+      "parent": null,
+      "active": true,
+      "created": "2025-01-20"
+    },
+    "system": {
+      "id": "system",
+      "name": "System",
+      "parent": null,
+      "active": true,
+      "created": "2025-01-01"
+    }
+  }
+}
