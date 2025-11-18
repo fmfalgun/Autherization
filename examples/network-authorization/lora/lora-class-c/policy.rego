@@ -1,61 +1,76 @@
 package lora_class_c
 
-# LoRa Class C Authorization Policy
+# LoRa Class C (Continuous RX) - Protocol-Specific Authorization Policy
 #
-# This policy implements authorization for LoRa Class C
-#
-# Why this policy exists:
-# LoRa Class C requires specific security controls to ensure:
-# - Device authentication and validation
-# - Access control based on device capabilities
-# - Resource allocation and management
-# - Anomaly detection and prevention
+# This policy implements detailed authorization for LoRa Class C (Continuous RX) specific features.
+# Each rule is tailored to the unique capabilities and requirements of this protocol version.
 #
 # Author: Authorization Framework Team
 # Version: 1.0.0
 
 import future.keywords
 
-######################
-# DEFAULT DENY
-######################
-
-# Default deny - all actions denied unless explicitly allowed
 default allow := false
 
+
 ######################
-# DEVICE AUTHENTICATION
+# 1. CONTINUOUS RECEIVE
 ######################
 
-# Rule: Authenticate device
+# Rule: Continuous Receive
 #
-# Why: Ensures only authorized devices can connect
+# Why: Always listening except when transmitting. Lowest latency, highest power.
+allow if {
+    input.action == "enable_continuous_rx"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "enable_continuous_rx")
+    not exceeds_rate_limit(input.device.id, "enable_continuous_rx")
+}
+
+######################
+# 2. IMMEDIATE DOWNLINK
+######################
+
+# Rule: Immediate Downlink
+#
+# Why: Downlink possible anytime. No waiting for uplink or ping slot.
+allow if {
+    input.action == "send_immediate_downlink"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "send_immediate_downlink")
+    not exceeds_rate_limit(input.device.id, "send_immediate_downlink")
+}
+
+######################
+# 3. MAINS-POWERED OPERATION
+######################
+
+# Rule: Mains-Powered Operation
+#
+# Why: Class C typically for mains-powered devices. Battery would drain quickly.
+allow if {
+    input.action == "verify_mains_powered"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "verify_mains_powered")
+    not exceeds_rate_limit(input.device.id, "verify_mains_powered")
+}
+
+######################
+# STANDARD AUTHENTICATION & CONNECTION
+######################
+
 allow if {
     input.action == "authenticate"
     device_credentials_valid(input.device)
     device_not_blacklisted(input.device.id)
 }
 
-######################
-# CONNECTION AUTHORIZATION
-######################
-
-# Rule: Allow device connection
-#
-# Why: Validates device after authentication
 allow if {
     input.action == "connect"
     device_authenticated(input.device.id)
     network_has_capacity(input.network)
 }
 
-######################
-# DATA TRANSMISSION
-######################
-
-# Rule: Allow data transmission
-#
-# Why: Ensures data transfer is authorized and within quotas
 allow if {
     input.action == "transmit"
     device_connected(input.device.id)
@@ -63,21 +78,22 @@ allow if {
 }
 
 ######################
-# RESOURCE MANAGEMENT
-######################
-
-# Rule: Allocate network resources
-#
-# Why: Prevents resource exhaustion
-allow if {
-    input.action == "allocate_resources"
-    input.user.role == "network_admin"
-    resources_available(input.requested_resources)
-}
-
-######################
 # HELPER FUNCTIONS
 ######################
+
+device_authenticated(device_id) if {
+    data.active_sessions[device_id] != null
+}
+
+device_supports_feature(device, feature) if {
+    feature in data.authorized_devices[device.id].supported_features
+}
+
+exceeds_rate_limit(device_id, action) if {
+    count := data.rate_counters[device_id][action]
+    limit := data.rate_limits[action]
+    count >= limit
+}
 
 device_credentials_valid(device) if {
     device.id in data.authorized_devices
@@ -85,10 +101,6 @@ device_credentials_valid(device) if {
 
 device_not_blacklisted(device_id) if {
     not device_id in data.blacklisted_devices
-}
-
-device_authenticated(device_id) if {
-    data.active_sessions[device_id] != null
 }
 
 network_has_capacity(network) if {
@@ -106,8 +118,4 @@ data_within_quota(device_id, data_size) if {
     current := data.bandwidth_usage[device_id]
     quota := data.authorized_devices[device_id].quota
     current + data_size <= quota
-}
-
-resources_available(requested) if {
-    requested > 0
 }

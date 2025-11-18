@@ -1,61 +1,90 @@
 package openziti_identity_authorization
 
-# OpenZiti Identity Auth Authorization Policy
+# OpenZiti Identity Authorization - Protocol-Specific Authorization Policy
 #
-# This policy implements authorization for OpenZiti Identity Auth
-#
-# Why this policy exists:
-# OpenZiti Identity Auth requires specific security controls to ensure:
-# - Device authentication and validation
-# - Access control based on device capabilities
-# - Resource allocation and management
-# - Anomaly detection and prevention
+# This policy implements detailed authorization for OpenZiti Identity Authorization specific features.
+# Each rule is tailored to the unique capabilities and requirements of this protocol version.
 #
 # Author: Authorization Framework Team
 # Version: 1.0.0
 
 import future.keywords
 
-######################
-# DEFAULT DENY
-######################
-
-# Default deny - all actions denied unless explicitly allowed
 default allow := false
 
+
 ######################
-# DEVICE AUTHENTICATION
+# 1. IDENTITY VERIFICATION
 ######################
 
-# Rule: Authenticate device
+# Rule: Identity Verification
 #
-# Why: Ensures only authorized devices can connect
+# Why: Verify identity using certificate or enrollment token.
+allow if {
+    input.action == "verify_identity"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "verify_identity")
+    not exceeds_rate_limit(input.device.id, "verify_identity")
+}
+
+######################
+# 2. ENROLLMENT
+######################
+
+# Rule: Enrollment
+#
+# Why: One-time enrollment creates identity certificate.
+allow if {
+    input.action == "enroll_identity"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "enroll_identity")
+    not exceeds_rate_limit(input.device.id, "enroll_identity")
+}
+
+######################
+# 3. CERTIFICATE ROTATION
+######################
+
+# Rule: Certificate Rotation
+#
+# Why: Automatic certificate rotation before expiry.
+allow if {
+    input.action == "rotate_certificate"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "rotate_certificate")
+    not exceeds_rate_limit(input.device.id, "rotate_certificate")
+}
+
+######################
+# 4. MFA ENFORCEMENT
+######################
+
+# Rule: MFA Enforcement
+#
+# Why: Multi-factor authentication for sensitive services.
+allow if {
+    input.action == "enforce_mfa"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "enforce_mfa")
+    not exceeds_rate_limit(input.device.id, "enforce_mfa")
+}
+
+######################
+# STANDARD AUTHENTICATION & CONNECTION
+######################
+
 allow if {
     input.action == "authenticate"
     device_credentials_valid(input.device)
     device_not_blacklisted(input.device.id)
 }
 
-######################
-# CONNECTION AUTHORIZATION
-######################
-
-# Rule: Allow device connection
-#
-# Why: Validates device after authentication
 allow if {
     input.action == "connect"
     device_authenticated(input.device.id)
     network_has_capacity(input.network)
 }
 
-######################
-# DATA TRANSMISSION
-######################
-
-# Rule: Allow data transmission
-#
-# Why: Ensures data transfer is authorized and within quotas
 allow if {
     input.action == "transmit"
     device_connected(input.device.id)
@@ -63,21 +92,22 @@ allow if {
 }
 
 ######################
-# RESOURCE MANAGEMENT
-######################
-
-# Rule: Allocate network resources
-#
-# Why: Prevents resource exhaustion
-allow if {
-    input.action == "allocate_resources"
-    input.user.role == "network_admin"
-    resources_available(input.requested_resources)
-}
-
-######################
 # HELPER FUNCTIONS
 ######################
+
+device_authenticated(device_id) if {
+    data.active_sessions[device_id] != null
+}
+
+device_supports_feature(device, feature) if {
+    feature in data.authorized_devices[device.id].supported_features
+}
+
+exceeds_rate_limit(device_id, action) if {
+    count := data.rate_counters[device_id][action]
+    limit := data.rate_limits[action]
+    count >= limit
+}
 
 device_credentials_valid(device) if {
     device.id in data.authorized_devices
@@ -85,10 +115,6 @@ device_credentials_valid(device) if {
 
 device_not_blacklisted(device_id) if {
     not device_id in data.blacklisted_devices
-}
-
-device_authenticated(device_id) if {
-    data.active_sessions[device_id] != null
 }
 
 network_has_capacity(network) if {
@@ -106,8 +132,4 @@ data_within_quota(device_id, data_size) if {
     current := data.bandwidth_usage[device_id]
     quota := data.authorized_devices[device_id].quota
     current + data_size <= quota
-}
-
-resources_available(requested) if {
-    requested > 0
 }

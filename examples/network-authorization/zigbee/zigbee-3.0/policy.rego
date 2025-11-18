@@ -1,61 +1,90 @@
 package zigbee_3.0
 
-# Zigbee 3.0 Authorization Policy
+# Zigbee 3.0 (Unified Standard) - Protocol-Specific Authorization Policy
 #
-# This policy implements authorization for Zigbee 3.0
-#
-# Why this policy exists:
-# Zigbee 3.0 requires specific security controls to ensure:
-# - Device authentication and validation
-# - Access control based on device capabilities
-# - Resource allocation and management
-# - Anomaly detection and prevention
+# This policy implements detailed authorization for Zigbee 3.0 (Unified Standard) specific features.
+# Each rule is tailored to the unique capabilities and requirements of this protocol version.
 #
 # Author: Authorization Framework Team
 # Version: 1.0.0
 
 import future.keywords
 
-######################
-# DEFAULT DENY
-######################
-
-# Default deny - all actions denied unless explicitly allowed
 default allow := false
 
+
 ######################
-# DEVICE AUTHENTICATION
+# 1. GREEN POWER COMMISSIONING
 ######################
 
-# Rule: Authenticate device
+# Rule: Green Power Commissioning
 #
-# Why: Ensures only authorized devices can connect
+# Why: Green Power devices have no battery (energy harvesting). Proxy/sink commissioning.
+allow if {
+    input.action == "commission_green_power"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "commission_green_power")
+    not exceeds_rate_limit(input.device.id, "commission_green_power")
+}
+
+######################
+# 2. TOUCHLINK COMMISSIONING
+######################
+
+# Rule: Touchlink Commissioning
+#
+# Why: Touchlink adds device by physical proximity. No need for install code.
+allow if {
+    input.action == "commission_touchlink"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "commission_touchlink")
+    not exceeds_rate_limit(input.device.id, "commission_touchlink")
+}
+
+######################
+# 3. INSTALL CODE VALIDATION
+######################
+
+# Rule: Install Code Validation
+#
+# Why: Install code provides out-of-band key. Prevents unauthorized joining.
+allow if {
+    input.action == "validate_install_code"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "validate_install_code")
+    not exceeds_rate_limit(input.device.id, "validate_install_code")
+}
+
+######################
+# 4. BDB COMMISSIONING
+######################
+
+# Rule: BDB Commissioning
+#
+# Why: Base Device Behavior standardizes commissioning. Network steering, formation, finding.
+allow if {
+    input.action == "use_bdb"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "use_bdb")
+    not exceeds_rate_limit(input.device.id, "use_bdb")
+}
+
+######################
+# STANDARD AUTHENTICATION & CONNECTION
+######################
+
 allow if {
     input.action == "authenticate"
     device_credentials_valid(input.device)
     device_not_blacklisted(input.device.id)
 }
 
-######################
-# CONNECTION AUTHORIZATION
-######################
-
-# Rule: Allow device connection
-#
-# Why: Validates device after authentication
 allow if {
     input.action == "connect"
     device_authenticated(input.device.id)
     network_has_capacity(input.network)
 }
 
-######################
-# DATA TRANSMISSION
-######################
-
-# Rule: Allow data transmission
-#
-# Why: Ensures data transfer is authorized and within quotas
 allow if {
     input.action == "transmit"
     device_connected(input.device.id)
@@ -63,21 +92,22 @@ allow if {
 }
 
 ######################
-# RESOURCE MANAGEMENT
-######################
-
-# Rule: Allocate network resources
-#
-# Why: Prevents resource exhaustion
-allow if {
-    input.action == "allocate_resources"
-    input.user.role == "network_admin"
-    resources_available(input.requested_resources)
-}
-
-######################
 # HELPER FUNCTIONS
 ######################
+
+device_authenticated(device_id) if {
+    data.active_sessions[device_id] != null
+}
+
+device_supports_feature(device, feature) if {
+    feature in data.authorized_devices[device.id].supported_features
+}
+
+exceeds_rate_limit(device_id, action) if {
+    count := data.rate_counters[device_id][action]
+    limit := data.rate_limits[action]
+    count >= limit
+}
 
 device_credentials_valid(device) if {
     device.id in data.authorized_devices
@@ -85,10 +115,6 @@ device_credentials_valid(device) if {
 
 device_not_blacklisted(device_id) if {
     not device_id in data.blacklisted_devices
-}
-
-device_authenticated(device_id) if {
-    data.active_sessions[device_id] != null
 }
 
 network_has_capacity(network) if {
@@ -106,8 +132,4 @@ data_within_quota(device_id, data_size) if {
     current := data.bandwidth_usage[device_id]
     quota := data.authorized_devices[device_id].quota
     current + data_size <= quota
-}
-
-resources_available(requested) if {
-    requested > 0
 }
