@@ -1,0 +1,50 @@
+{
+  "users": {
+    "alice": {
+      "roles": ["admin"],
+      "department": "engineering",
+      "email": "alice@example.com"
+    },
+    "bob": {
+      "roles": ["editor"],
+      "department": "engineering",
+      "email": "bob@example.com"
+    },
+    "charlie": {
+      "roles": ["viewer"],
+      "department": "marketing",
+      "email": "charlie@example.com"
+    },
+    "diana": {
+      "roles": ["editor"],
+      "department": "marketing",
+      "email": "diana@example.com"
+    }
+  },
+  "resources": {
+    "document123": {
+      "owner": "bob",
+      "type": "document",
+      "department": "engineering",
+      "created": "2025-01-15"
+    },
+    "document456": {
+      "owner": "diana",
+      "type": "document",
+      "department": "marketing",
+      "created": "2025-02-01"
+    },
+    "report789": {
+      "owner": "bob",
+      "type": "report",
+      "department": "engineering",
+      "created": "2025-03-10"
+    },
+    "presentation001": {
+      "owner": "diana",
+      "type": "presentation",
+      "department": "marketing",
+      "created": "2025-03-15"
+    }
+  }
+}

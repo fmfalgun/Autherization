@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  casbin-app:
+    build: .
+    container_name: casbin-rbac-example
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./model.conf:/root/model.conf:ro
+      - ./policy.csv:/root/policy.csv
+    environment:
+      - PORT=8080
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - casbin-network
+
+networks:
+  casbin-network:
+    driver: bridge
