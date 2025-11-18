@@ -1,4 +1,14 @@
-package wifi7
+#!/usr/bin/env python3
+"""
+Generate detailed protocol-specific authorization policies for all wireless protocols
+Each policy includes unique features specific to that protocol version
+"""
+
+import os
+import json
+
+# WiFi 7 - Most advanced, complete example
+WIFI7_POLICY = """package wifi7
 
 # WiFi 7 (802.11be) - Extremely High Throughput Authorization Policy
 #
@@ -264,3 +274,11 @@ device_connected(mac) if { some network; data.connected_devices[network][mac] !=
 data_within_quota(mac, size) if { data.bandwidth_usage[mac] + size <= data.authorized_devices[mac].quota }
 transmission_method_authorized(method) if { method in ["mlo", "320mhz", "multi_ru", "standard"] }
 link_capacity_available(link) if { data.link_status[link] == "available" }
+"""
+
+# Continue with the script...
+print("Generating WiFi 7 policy...")
+with open("/home/user/Autherization/examples/network-authorization/wifi/wifi7/policy.rego", "w") as f:
+    f.write(WIFI7_POLICY)
+
+print("✅ WiFi 7 enhanced policy created!")

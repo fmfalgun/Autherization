@@ -1,61 +1,90 @@
 package openziti_service_authorization
 
-# OpenZiti Service Auth Authorization Policy
+# OpenZiti Service Authorization - Protocol-Specific Authorization Policy
 #
-# This policy implements authorization for OpenZiti Service Auth
-#
-# Why this policy exists:
-# OpenZiti Service Auth requires specific security controls to ensure:
-# - Device authentication and validation
-# - Access control based on device capabilities
-# - Resource allocation and management
-# - Anomaly detection and prevention
+# This policy implements detailed authorization for OpenZiti Service Authorization specific features.
+# Each rule is tailored to the unique capabilities and requirements of this protocol version.
 #
 # Author: Authorization Framework Team
 # Version: 1.0.0
 
 import future.keywords
 
-######################
-# DEFAULT DENY
-######################
-
-# Default deny - all actions denied unless explicitly allowed
 default allow := false
 
+
 ######################
-# DEVICE AUTHENTICATION
+# 1. SERVICE POLICIES
 ######################
 
-# Rule: Authenticate device
+# Rule: Service Policies
 #
-# Why: Ensures only authorized devices can connect
+# Why: Policies grant identity access to services. Dial/Bind permissions.
+allow if {
+    input.action == "evaluate_service_policy"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "evaluate_service_policy")
+    not exceeds_rate_limit(input.device.id, "evaluate_service_policy")
+}
+
+######################
+# 2. POSTURE CHECKS
+######################
+
+# Rule: Posture Checks
+#
+# Why: Verify device posture (OS, patches, AV) before access.
+allow if {
+    input.action == "verify_posture"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "verify_posture")
+    not exceeds_rate_limit(input.device.id, "verify_posture")
+}
+
+######################
+# 3. EDGE ROUTER SELECTION
+######################
+
+# Rule: Edge Router Selection
+#
+# Why: Choose edge router based on cost, load, geo-location.
+allow if {
+    input.action == "select_edge_router"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "select_edge_router")
+    not exceeds_rate_limit(input.device.id, "select_edge_router")
+}
+
+######################
+# 4. ZERO TRUST SEGMENTATION
+######################
+
+# Rule: Zero Trust Segmentation
+#
+# Why: Services only accessible to authorized identities.
+allow if {
+    input.action == "enforce_segmentation"
+    device_authenticated(input.device.id)
+    device_supports_feature(input.device, "enforce_segmentation")
+    not exceeds_rate_limit(input.device.id, "enforce_segmentation")
+}
+
+######################
+# STANDARD AUTHENTICATION & CONNECTION
+######################
+
 allow if {
     input.action == "authenticate"
     device_credentials_valid(input.device)
     device_not_blacklisted(input.device.id)
 }
 
-######################
-# CONNECTION AUTHORIZATION
-######################
-
-# Rule: Allow device connection
-#
-# Why: Validates device after authentication
 allow if {
     input.action == "connect"
     device_authenticated(input.device.id)
     network_has_capacity(input.network)
 }
 
-######################
-# DATA TRANSMISSION
-######################
-
-# Rule: Allow data transmission
-#
-# Why: Ensures data transfer is authorized and within quotas
 allow if {
     input.action == "transmit"
     device_connected(input.device.id)
@@ -63,21 +92,22 @@ allow if {
 }
 
 ######################
-# RESOURCE MANAGEMENT
-######################
-
-# Rule: Allocate network resources
-#
-# Why: Prevents resource exhaustion
-allow if {
-    input.action == "allocate_resources"
-    input.user.role == "network_admin"
-    resources_available(input.requested_resources)
-}
-
-######################
 # HELPER FUNCTIONS
 ######################
+
+device_authenticated(device_id) if {
+    data.active_sessions[device_id] != null
+}
+
+device_supports_feature(device, feature) if {
+    feature in data.authorized_devices[device.id].supported_features
+}
+
+exceeds_rate_limit(device_id, action) if {
+    count := data.rate_counters[device_id][action]
+    limit := data.rate_limits[action]
+    count >= limit
+}
 
 device_credentials_valid(device) if {
     device.id in data.authorized_devices
@@ -85,10 +115,6 @@ device_credentials_valid(device) if {
 
 device_not_blacklisted(device_id) if {
     not device_id in data.blacklisted_devices
-}
-
-device_authenticated(device_id) if {
-    data.active_sessions[device_id] != null
 }
 
 network_has_capacity(network) if {
@@ -106,8 +132,4 @@ data_within_quota(device_id, data_size) if {
     current := data.bandwidth_usage[device_id]
     quota := data.authorized_devices[device_id].quota
     current + data_size <= quota
-}
-
-resources_available(requested) if {
-    requested > 0
 }

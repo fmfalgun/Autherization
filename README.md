@@ -48,7 +48,27 @@ Core concepts, technologies, and standards essential for understanding authoriza
 - [Token Management](./fundamentals/tokens-sessions/tokens.md)
 - [Session Management](./fundamentals/tokens-sessions/session-management.md)
 
-### 3. [Comparative Analysis](./COMPARISON.md)
+### 3. [Examples](./examples/)
+Production-ready code examples demonstrating authorization in practice.
+
+#### [Application Authorization Examples](./examples/)
+- **[OPA Simple](./examples/opa-simple/)** - Basic RBAC with OPA and Rego
+- **[Casbin RBAC](./examples/casbin-rbac/)** - Go web server with Casbin
+- **[CASL React](./examples/casl-react/)** - Full-stack React + Express with CASL
+- **[Multi-Tenant](./examples/multi-tenant/)** - SaaS multi-tenancy with OPA
+
+#### [Network Authorization Examples](./examples/network-authorization/)
+Comprehensive OPA policies for IoT and wireless protocols:
+- **WiFi** (7 standards) - Normal, WiFi 4/5/6/7, Ad-hoc, Enterprise
+- **BLE** (8 versions) - BLE 4.0-5.4 with protocol-specific features
+- **Bluetooth Classic** (4 versions) - BT 2.0-5.0
+- **Zigbee** (2 variants) - Zigbee 3.0, Zigbee PRO
+- **LoRa/LoRaWAN** (6 variants) - Class A/B/C, LoRaWAN 1.0-1.1
+- **Spire & OpenZiti** - Service mesh authorization
+- **Zero Trust** - Device trust & continuous validation
+- **Continuous Monitoring** - Anomaly detection & security response
+
+### 4. [Comparative Analysis](./COMPARISON.md)
 Detailed comparison of all frameworks across multiple dimensions:
 - Performance
 - Ease of use
