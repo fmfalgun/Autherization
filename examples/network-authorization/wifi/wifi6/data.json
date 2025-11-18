@@ -1,0 +1,180 @@
+{
+  "access_points": {
+    "00:11:22:33:44:55": {
+      "bssid": "00:11:22:33:44:55",
+      "ssid": "Enterprise-WiFi6",
+      "channel": 36,
+      "bandwidth": "80MHz",
+      "security": "WPA3-Enterprise-192bit",
+      "max_clients": 50,
+      "current_clients": 12,
+      "spatial_streams": 8,
+      "ofdma_enabled": true,
+      "mu_mimo_enabled": true,
+      "twt_enabled": true,
+      "bss_color": 5,
+      "mobility_domain": "MD01"
+    },
+    "00:11:22:33:44:56": {
+      "bssid": "00:11:22:33:44:56",
+      "ssid": "Guest-WiFi6",
+      "channel": 48,
+      "bandwidth": "80MHz",
+      "security": "OWE",
+      "max_clients": 100,
+      "current_clients": 45,
+      "spatial_streams": 4,
+      "ofdma_enabled": true,
+      "mu_mimo_enabled": false,
+      "twt_enabled": false,
+      "bss_color": 10,
+      "mobility_domain": "MD01"
+    }
+  },
+  "authorized_devices": {
+    "AA:BB:CC:DD:EE:FF": {
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "type": "smartphone",
+      "manufacturer": "Apple",
+      "model": "iPhone 14 Pro",
+      "wifi6_capable": true,
+      "security_protocols": ["WPA3-SAE", "WPA3-Enterprise"],
+      "pmf_capable": true,
+      "twt_capable": true,
+      "mu_mimo_capable": true,
+      "qos_level": 7,
+      "max_bandwidth_mbps": 1200,
+      "power_save": true,
+      "certificate": {
+        "issuer": "Corporate-CA",
+        "expiry_date": 1893456000000000000
+      }
+    },
+    "11:22:33:44:55:66": {
+      "mac": "11:22:33:44:55:66",
+      "type": "laptop",
+      "manufacturer": "Dell",
+      "model": "XPS 15",
+      "wifi6_capable": true,
+      "security_protocols": ["WPA3-SAE", "WPA3-Enterprise"],
+      "pmf_capable": true,
+      "twt_capable": false,
+      "mu_mimo_capable": true,
+      "qos_level": 6,
+      "max_bandwidth_mbps": 2400,
+      "power_save": false,
+      "certificate": {
+        "issuer": "Corporate-CA",
+        "expiry_date": 1893456000000000000
+      }
+    },
+    "22:33:44:55:66:77": {
+      "mac": "22:33:44:55:66:77",
+      "type": "iot_sensor",
+      "manufacturer": "Generic",
+      "model": "Temp-Sensor-01",
+      "wifi6_capable": true,
+      "security_protocols": ["WPA3-SAE"],
+      "pmf_capable": true,
+      "twt_capable": true,
+      "mu_mimo_capable": false,
+      "qos_level": 2,
+      "max_bandwidth_mbps": 10,
+      "power_save": true,
+      "certificate": null
+    },
+    "33:44:55:66:77:88": {
+      "mac": "33:44:55:66:77:88",
+      "type": "tablet",
+      "manufacturer": "Samsung",
+      "model": "Galaxy Tab S9",
+      "wifi6_capable": true,
+      "security_protocols": ["WPA3-SAE"],
+      "pmf_capable": true,
+      "twt_capable": true,
+      "mu_mimo_capable": true,
+      "qos_level": 5,
+      "max_bandwidth_mbps": 800,
+      "power_save": true,
+      "certificate": null
+    }
+  },
+  "authenticated_sessions": {
+    "AA:BB:CC:DD:EE:FF": {
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "ssid": "Enterprise-WiFi6",
+      "auth_time": 1700000000000000000,
+      "expiry": 1900000000000000000,
+      "method": "WPA3-Enterprise"
+    },
+    "11:22:33:44:55:66": {
+      "mac": "11:22:33:44:55:66",
+      "ssid": "Enterprise-WiFi6",
+      "auth_time": 1700000100000000000,
+      "expiry": 1900000000000000000,
+      "method": "WPA3-Enterprise"
+    }
+  },
+  "connected_devices": {
+    "Enterprise-WiFi6": {
+      "AA:BB:CC:DD:EE:FF": {
+        "connection_time": 1700000000000000000,
+        "ip_address": "192.168.1.100",
+        "assigned_ru": 242,
+        "mimo_streams": 2
+      },
+      "11:22:33:44:55:66": {
+        "connection_time": 1700000100000000000,
+        "ip_address": "192.168.1.101",
+        "assigned_ru": 484,
+        "mimo_streams": 2
+      }
+    },
+    "Guest-WiFi6": {}
+  },
+  "ofdma_allocations": {
+    "36": [
+      {"device": "AA:BB:CC:DD:EE:FF", "ru_size": 242, "start_tone": 0},
+      {"device": "11:22:33:44:55:66", "ru_size": 484, "start_tone": 242}
+    ],
+    "48": []
+  },
+  "twt_schedules": {
+    "22:33:44:55:66:77": [
+      {
+        "start_time": 1700000000000,
+        "interval_ms": 10000,
+        "duration_ms": 100,
+        "type": "individual"
+      }
+    ]
+  },
+  "roaming_keys": {
+    "AA:BB:CC:DD:EE:FF": {
+      "00:11:22:33:44:55": "pmk_r1_key_ap1",
+      "00:11:22:33:44:56": "pmk_r1_key_ap2"
+    }
+  },
+  "bandwidth_usage": {
+    "AA:BB:CC:DD:EE:FF": 524288000,
+    "11:22:33:44:55:66": 1048576000,
+    "22:33:44:55:66:77": 102400
+  },
+  "channel_utilization": {
+    "36": 65,
+    "48": 42,
+    "52": 78,
+    "100": 55
+  },
+  "blacklisted_devices": [
+    "DE:AD:BE:EF:CA:FE"
+  ],
+  "blocked_destinations": [
+    "192.168.1.666",
+    "10.0.0.13"
+  ],
+  "trusted_cas": [
+    "Corporate-CA",
+    "GlobalSign-Root-CA"
+  ]
+}

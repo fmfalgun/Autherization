@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: ble-5.1-opa
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=info"
+    volumes:
+      - ./policy.rego:/policies/policy.rego:ro
+      - ./data.json:/data/data.json:ro
+    networks:
+      - ble-5.1-network
+
+networks:
+  ble-5.1-network:
+    driver: bridge

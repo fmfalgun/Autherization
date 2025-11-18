@@ -1,0 +1,114 @@
+{
+  "trusted_cas": [
+    "CN=Monitoring-CA,O=Security-Org",
+    "CN=Enterprise-Root-CA"
+  ],
+  "monitoring_nodes": {
+    "wifi-sniffer-01": {
+      "node_id": "wifi-sniffer-01",
+      "certificate": {
+        "subject": "CN=WiFi-Sniffer-01",
+        "issuer": "CN=Monitoring-CA",
+        "expiry_timestamp": 1893456000000000000,
+        "serial_number": "ABC123"
+      },
+      "location": {
+        "building": "HQ",
+        "floor": 3,
+        "room": "Network-Closet-3A"
+      },
+      "capabilities": ["wifi"],
+      "public_key": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhk..."
+    },
+    "ble-sniffer-02": {
+      "node_id": "ble-sniffer-02",
+      "certificate": {
+        "subject": "CN=BLE-Sniffer-02",
+        "issuer": "CN=Monitoring-CA",
+        "expiry_timestamp": 1893456000000000000,
+        "serial_number": "DEF456"
+      },
+      "location": {
+        "building": "HQ",
+        "floor": 2,
+        "room": "Security-Ops"
+      },
+      "capabilities": ["ble", "bluetooth"],
+      "public_key": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhk..."
+    },
+    "multi-protocol-03": {
+      "node_id": "multi-protocol-03",
+      "certificate": {
+        "subject": "CN=Multi-Protocol-03",
+        "issuer": "CN=Monitoring-CA",
+        "expiry_timestamp": 1893456000000000000,
+        "serial_number": "GHI789"
+      },
+      "location": {
+        "building": "Data-Center",
+        "floor": 1,
+        "room": "DC-Main"
+      },
+      "capabilities": ["wifi", "ble", "bluetooth", "zigbee", "lora"],
+      "public_key": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhk..."
+    }
+  },
+  "valid_anomaly_types": {
+    "wifi": ["deauth_flood", "rogue_ap", "evil_twin", "weak_encryption", "unusual_signal"],
+    "ble": ["advertising_flood", "spoofed_beacon", "pairing_attack", "rssi_manipulation"],
+    "bluetooth": ["bluejacking", "bluesnarfing", "blueborne", "unauthorized_pairing"],
+    "zigbee": ["unauthorized_coordinator", "key_compromise", "command_injection", "join_flood"],
+    "lora": ["join_replay", "abp_attack", "downlink_injection", "devnonce_reuse"]
+  },
+  "anomaly_thresholds": {
+    "deauth_flood": {
+      "severity_threshold": 75,
+      "count_threshold": 100,
+      "duration_sec": 60
+    },
+    "rogue_ap": {
+      "severity_threshold": 95,
+      "confidence_threshold": 0.9
+    },
+    "advertising_flood": {
+      "severity_threshold": 60,
+      "count_threshold": 1000,
+      "duration_sec": 10
+    },
+    "bluesnarfing": {
+      "severity_threshold": 98,
+      "confidence_threshold": 0.95
+    }
+  },
+  "devices": {
+    "AA:BB:CC:DD:EE:FF": {
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "type": "smartphone",
+      "trust_score": 85
+    },
+    "11:22:33:44:55:66": {
+      "mac": "11:22:33:44:55:66",
+      "type": "iot_sensor",
+      "trust_score": 70
+    }
+  },
+  "device_anomaly_history": {
+    "AA:BB:CC:DD:EE:FF": [],
+    "DE:AD:BE:EF:00:00": [
+      {"type": "deauth_flood", "timestamp": 1700000000, "severity": "high"},
+      {"type": "rogue_ap", "timestamp": 1700001000, "severity": "critical"},
+      {"type": "evil_twin", "timestamp": 1700002000, "severity": "critical"}
+    ]
+  },
+  "anomaly_reports": {},
+  "recent_anomalies": {},
+  "recent_alerts": [],
+  "false_positives": [],
+  "rate_limits": {},
+  "rate_limit_thresholds": {
+    "metrics": 1000,
+    "database_writes": 500,
+    "alerts": 100
+  },
+  "revoked_certificates": []
+}

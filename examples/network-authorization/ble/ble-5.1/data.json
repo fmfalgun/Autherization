@@ -1,0 +1,40 @@
+{
+  "authorized_devices": {
+    "device-001": {
+      "id": "device-001",
+      "type": "sensor",
+      "quota": 1000000
+    },
+    "device-002": {
+      "id": "device-002",
+      "type": "gateway",
+      "quota": 10000000
+    }
+  },
+  "blacklisted_devices": [
+    "device-bad"
+  ],
+  "active_sessions": {
+    "device-001": {
+      "connected_at": 1700000000,
+      "network_id": "network-001"
+    }
+  },
+  "networks": {
+    "network-001": {
+      "id": "network-001",
+      "max_devices": 100
+    }
+  },
+  "connected_devices": {
+    "network-001": {
+      "device-001": {
+        "ip": "10.0.0.10"
+      }
+    }
+  },
+  "bandwidth_usage": {
+    "device-001": 50000,
+    "device-002": 100000
+  }
+}
